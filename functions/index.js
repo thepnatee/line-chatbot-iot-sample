@@ -33,12 +33,9 @@ exports.Webhook = functions.region("asia-northeast1").https.onRequest(async (req
             if (event.type === "follow") {
                 let profile = await insertUpdateUser(event.source.userId)
                 await util.reply(event.replyToken, [flex.quickReplyWelcomeMessage(profile.data.displayName)]);
-            }
-            if (event.type === "unfollow") {
+            } else if (event.type === "unfollow") {
                 deleteGroup(event.source.userId);
-            }
-
-            if (event.type === "message") {
+            } else if (event.type === "message") {
 
                 if (event.message.type === "text") {
 
@@ -47,24 +44,18 @@ exports.Webhook = functions.region("asia-northeast1").https.onRequest(async (req
                     if (textMessage === "report") {
                         // GET API Report Sensor
                         await util.reply(event.replyToken, [flex.reportSensor('25.1', '68'), flex.quickReplyReport()]);
-                    }
-
-                    if (textMessage === "setting-notify on") {
+                    } else if (textMessage === "setting-notify on") {
                         settingNotifyUpdateUser(event.replyToken, event.source.userId, 'on')
-                    }
-                    if (textMessage === "setting-notify off") {
+                    } else if (textMessage === "setting-notify off") {
                         settingNotifyUpdateUser(event.replyToken, event.source.userId, 'off')
+                    } else {
+                        await util.postToDialogflow(req);
                     }
-                    // await util.reply(event.replyToken, [flex.quickReplyWelcomeMessage(profile.data.displayName)]);
-
-
                 }
 
 
 
-            }
-
-            if (event.type === "postback") {
+            } else if (event.type === "postback") {
                 if (event.postback.data === "setting-notify-on") {
                     settingNotifyUpdateUser(event.replyToken, event.source.userId, 'on')
                 }
@@ -72,7 +63,6 @@ exports.Webhook = functions.region("asia-northeast1").https.onRequest(async (req
                     settingNotifyUpdateUser(event.replyToken, event.source.userId, 'off')
                 }
             }
-
         }
 
     }
